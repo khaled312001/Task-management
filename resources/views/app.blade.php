@@ -8,12 +8,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    @php
-        // On Vercel, load assets from Hostinger (Vercel can't serve them reliably)
-        $isVercel = str_contains(request()->getHost(), 'vercel.app');
-        $assetUrl = $isVercel ? 'https://tasks.barmagly.tech/css/app.css' : asset('css/app.css') . '?v=' . time();
-    @endphp
-    <link rel="stylesheet" href="{{ $assetUrl }}">
+    <link rel="stylesheet" href="https://tasks.barmagly.tech/css/app.css?v={{ time() }}">
 </head>
 <body>
 <div id="app" class="app">
@@ -583,9 +578,6 @@
 
 <script>window.APP_USER = @json(Auth::user());</script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-@php
-    $jsUrl = $isVercel ? 'https://tasks.barmagly.tech/js/app.js' : asset('js/app.js') . '?v=' . time();
-@endphp
-<script src="{{ $jsUrl }}"></script>
+<script src="https://tasks.barmagly.tech/js/app.js?v={{ time() }}"></script>
 </body>
 </html>
