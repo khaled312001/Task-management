@@ -69,7 +69,14 @@
                 <button class="btn btn-primary btn-sm topbar-add-task" id="quickAddTaskBtn" title="إضافة مهمة سريعة">
                     <i class="fas fa-plus"></i> <span class="hide-mobile">مهمة جديدة</span>
                 </button>
-                <div class="notification-bell" id="notifBell"><i class="fas fa-bell"></i><span class="notif-badge hidden" id="notifBadge">0</span></div>
+                <div class="notification-bell" id="notifBell">
+                    <i class="fas fa-bell"></i>
+                    <span class="notif-badge hidden" id="notifBadge">0</span>
+                    <div class="notif-panel hidden" id="notifPanel">
+                        <div class="notif-header"><h4>الإشعارات</h4><button class="btn-link" id="markAllRead">تحديد الكل كمقروء</button></div>
+                        <div class="notif-list" id="notifList"></div>
+                    </div>
+                </div>
                 <div class="user-dropdown-wrap">
                     <div class="topbar-avatar" id="topbarAvatar" title="القائمة"></div>
                     <div class="user-dropdown hidden" id="userDropdown">
@@ -457,11 +464,6 @@
     </div>
 </div>
 
-<!-- Notification Panel -->
-<div class="notif-panel hidden" id="notifPanel">
-    <div class="notif-header"><h4>الإشعارات</h4><button class="btn-link" id="markAllRead">تحديد الكل كمقروء</button></div>
-    <div class="notif-list" id="notifList"></div>
-</div>
 
 <!-- ===== SMTP Modal ===== -->
 <div class="modal-overlay hidden" id="smtpModal">

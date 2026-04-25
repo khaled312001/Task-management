@@ -500,11 +500,15 @@ input, select, textarea { font-family: inherit; }
 .color-option.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
 
 /* ==================== Notifications Panel ==================== */
+.notification-bell { position: relative; }
 .notif-panel {
-    position: fixed; top: var(--topbar-height); left: 50%; transform: translateX(-50%);
-    width: 380px; max-height: 400px; background: var(--bg-secondary);
-    border-radius: 0 0 var(--radius) var(--radius); border: 1px solid var(--border);
-    box-shadow: var(--shadow-lg); z-index: 200; display: flex; flex-direction: column;
+    position: absolute; top: calc(100% + 10px); left: 0;
+    width: 360px; max-height: 420px; background: var(--bg-card);
+    border-radius: 14px; border: 1px solid var(--border);
+    box-shadow: 0 10px 40px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.05);
+    z-index: 1000; display: flex; flex-direction: column;
+    overflow: hidden;
+    animation: dropdownFadeIn .2s ease-out;
 }
 .notif-header {
     padding: 12px 16px; border-bottom: 1px solid var(--border);
@@ -574,7 +578,7 @@ input, select, textarea { font-family: inherit; }
     .task-modal .modal-body { flex-direction: column; }
     .task-modal-sidebar { width: 100%; }
     .modal { max-height: 95vh; margin: 8px; }
-    .notif-panel { width: calc(100% - 20px); left: 10px; transform: none; }
+    .notif-panel { width: calc(100vw - 20px); left: -10px; right: auto; max-width: 360px; }
     .team-grid { grid-template-columns: 1fr; }
     .my-tasks-stats { gap: 10px; }
     .form-row { flex-direction: column; gap: 0; }
