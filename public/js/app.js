@@ -276,8 +276,22 @@ const App = {
         document.getElementById('memberForm').onsubmit = (e) => { e.preventDefault(); this.createMember(); };
 
         // Notifications
-        document.getElementById('notifBell').onclick = () => this.toggleNotifications();
-        document.getElementById('markAllRead').onclick = () => this.markAllNotificationsRead();
+        document.getElementById('notifBell').onclick = (e) => {
+            // Don't toggle if clicking inside the panel
+            if (e.target.closest('.notif-panel')) return;
+            e.stopPropagation();
+            this.toggleNotifications();
+        };
+        document.getElementById('markAllRead').onclick = (e) => { e.stopPropagation(); this.markAllNotificationsRead(); };
+
+        // Close notif panel on outside click
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('notifPanel');
+            const bell = document.getElementById('notifBell');
+            if (panel && bell && !bell.contains(e.target)) {
+                panel.classList.add('hidden');
+            }
+        });
 
         // Close modals on overlay click
         document.querySelectorAll('.modal-overlay').forEach(overlay => {

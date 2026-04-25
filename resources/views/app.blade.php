@@ -9,11 +9,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     @php
-        // Use jsDelivr CDN to serve CSS/JS from GitHub for reliable delivery on Vercel
-        $cdnBase = 'https://cdn.jsdelivr.net/gh/khaled312001/Task-management@main/public';
-        $isLocal = !str_contains(request()->getHost(), 'vercel.app');
+        // Inline CSS for fastest loading + zero cache issues
+        $cssPaths = [
+            base_path('public/css/app.css'),
+            __DIR__ . '/../../public/css/app.css',
+            $_SERVER['DOCUMENT_ROOT'] . '/public/css/app.css',
+        ];
+        $cssContent = '';
+        foreach ($cssPaths as $p) {
+            if (file_exists($p)) { $cssContent = file_get_contents($p); break; }
+        }
     @endphp
-    <link rel="stylesheet" href="{{ $isLocal ? asset('css/app.css').'?v='.time() : $cdnBase.'/css/app.css' }}">
+    <style>{!! $cssContent !!}</style>
 </head>
 <body>
 <div id="app" class="app">
@@ -665,6 +672,17 @@
 
 <script>window.APP_USER = @json(Auth::user());</script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-<script src="{{ $isLocal ? asset('js/app.js').'?v='.time() : $cdnBase.'/js/app.js' }}"></script>
+@php
+    $jsPaths = [
+        base_path('public/js/app.js'),
+        __DIR__ . '/../../public/js/app.js',
+        $_SERVER['DOCUMENT_ROOT'] . '/public/js/app.js',
+    ];
+    $jsContent = '';
+    foreach ($jsPaths as $p) {
+        if (file_exists($p)) { $jsContent = file_get_contents($p); break; }
+    }
+@endphp
+<script>{!! $jsContent !!}</script>
 </body>
 </html>
