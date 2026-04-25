@@ -115,4 +115,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/whatsapp/campaigns/{campaign}/process', [WhatsappController::class, 'processBatchWa']);
     Route::post('/api/whatsapp/campaigns/{campaign}/pause', [WhatsappController::class, 'pauseCampaign']);
     Route::delete('/api/whatsapp/campaigns/{campaign}', [WhatsappController::class, 'deleteCampaign']);
+
+    // ===== One-time setup: Add 4 new projects =====
+    Route::get('/setup/add-new-projects', function () {
+        return \App\Http\Controllers\SetupController::addNewProjects();
+    });
 });
