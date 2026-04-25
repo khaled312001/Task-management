@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.php",
+      "src": "_vercel/handler.php",
       "use": "vercel-php@0.7.3",
       "config": {
         "memory": 1024,
@@ -15,14 +15,14 @@
     }
   ],
   "routes": [
-    { "src": "/css/(.*)", "dest": "/public/css/$1" },
-    { "src": "/js/(.*)", "dest": "/public/js/$1" },
-    { "src": "/build/(.*)", "dest": "/public/build/$1" },
-    { "src": "/images/(.*)", "dest": "/public/images/$1" },
-    { "src": "/favicon.ico", "dest": "/public/favicon.ico" },
-    { "src": "/robots.txt", "dest": "/public/robots.txt" },
-    { "src": "/(.+\\.(css|js|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot|map))", "dest": "/public/$1" },
-    { "src": "/(.*)", "dest": "/api/index.php" }
+    { "src": "^/css/(.*)$", "dest": "/public/css/$1" },
+    { "src": "^/js/(.*)$", "dest": "/public/js/$1" },
+    { "src": "^/build/(.*)$", "dest": "/public/build/$1" },
+    { "src": "^/images/(.*)$", "dest": "/public/images/$1" },
+    { "src": "^/favicon\\.ico$", "dest": "/public/favicon.ico" },
+    { "src": "^/robots\\.txt$", "dest": "/public/robots.txt" },
+    { "src": "^/(.*)\\.(css|js|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot|map)$", "dest": "/public/$1.$2" },
+    { "src": "^/(.*)$", "dest": "/_vercel/handler.php" }
   ],
   "env": {
     "APP_ENV": "production",
@@ -47,7 +47,6 @@
     "FILESYSTEM_DISK": "local",
     "LOG_CHANNEL": "stderr",
     "LOG_LEVEL": "error",
-    "BCRYPT_ROUNDS": "10",
-    "ASSET_URL": "https://task-management-rose-seven.vercel.app"
+    "BCRYPT_ROUNDS": "10"
   }
 }
