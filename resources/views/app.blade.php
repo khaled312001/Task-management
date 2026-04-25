@@ -66,8 +66,36 @@
             </div>
             <div class="topbar-left">
                 <div class="search-box"><i class="fas fa-search"></i><input type="text" id="globalSearch" placeholder="بحث..."></div>
+                <button class="btn btn-primary btn-sm topbar-add-task" id="quickAddTaskBtn" title="إضافة مهمة سريعة">
+                    <i class="fas fa-plus"></i> <span class="hide-mobile">مهمة جديدة</span>
+                </button>
                 <div class="notification-bell" id="notifBell"><i class="fas fa-bell"></i><span class="notif-badge hidden" id="notifBadge">0</span></div>
-                <div class="topbar-avatar" id="topbarAvatar"></div>
+                <div class="user-dropdown-wrap">
+                    <div class="topbar-avatar" id="topbarAvatar" title="القائمة"></div>
+                    <div class="user-dropdown hidden" id="userDropdown">
+                        <div class="user-dropdown-header">
+                            <div class="user-dropdown-avatar" id="dropdownAvatar"></div>
+                            <div class="user-dropdown-info">
+                                <div class="user-dropdown-name" id="dropdownUserName"></div>
+                                <div class="user-dropdown-email" id="dropdownUserEmail"></div>
+                            </div>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="#" class="user-dropdown-item" id="dropdownProfile">
+                            <i class="fas fa-user"></i> الملف الشخصي
+                        </a>
+                        <a href="#" class="user-dropdown-item" id="dropdownMyTasks">
+                            <i class="fas fa-check-square"></i> مهامي
+                        </a>
+                        <a href="#" class="user-dropdown-item" id="dropdownSettings">
+                            <i class="fas fa-cog"></i> الإعدادات
+                        </a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="#" class="user-dropdown-item user-dropdown-danger" id="dropdownLogout">
+                            <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                        </a>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -324,6 +352,58 @@
 </div>
 
 <!-- New Task Modal -->
+<!-- Quick Add Task Modal (with board/list selection) -->
+<div class="modal-overlay hidden" id="quickTaskModal">
+    <div class="modal small-modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-bolt" style="color:var(--warning)"></i> إضافة مهمة سريعة</h3>
+            <button class="modal-close" onclick="document.getElementById('quickTaskModal').classList.add('hidden')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="quickTaskForm">
+                <div class="form-group">
+                    <label>المشروع</label>
+                    <select id="quickTaskBoard" required></select>
+                </div>
+                <div class="form-group">
+                    <label>القائمة</label>
+                    <select id="quickTaskList" required></select>
+                </div>
+                <div class="form-group">
+                    <label>عنوان المهمة</label>
+                    <input type="text" id="quickTaskTitle" required placeholder="ماذا يجب فعله؟">
+                </div>
+                <div class="form-group">
+                    <label>الوصف</label>
+                    <textarea id="quickTaskDesc" placeholder="تفاصيل المهمة..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>إسناد إلى</label>
+                        <select id="quickTaskAssigned"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>الأولوية</label>
+                        <select id="quickTaskPriority">
+                            <option value="low">منخفض</option>
+                            <option value="medium" selected>متوسط</option>
+                            <option value="high">مرتفع</option>
+                            <option value="urgent">عاجل</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ الاستحقاق</label>
+                    <input type="date" id="quickTaskDueDate">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-paper-plane"></i> إنشاء وإسناد المهمة
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay hidden" id="newTaskModal">
     <div class="modal small-modal">
         <div class="modal-header"><h3>مهمة جديدة</h3><button class="modal-close" id="newTaskModalClose"><i class="fas fa-times"></i></button></div>

@@ -34,6 +34,8 @@ const App = {
             this.setupEvents();
             this.setupEmailEvents();
             this.setupWhatsappEvents();
+            this.setupUserDropdown();
+            this.setupQuickAddTask();
             this.loadUser();
             await this.loadUsers();
             await this.loadBoards();
@@ -51,6 +53,7 @@ const App = {
         };
         avatar(document.getElementById('sidebarAvatar'), this.user);
         avatar(document.getElementById('topbarAvatar'), this.user);
+        avatar(document.getElementById('dropdownAvatar'), this.user);
     },
 
     loadUser() {
@@ -58,6 +61,144 @@ const App = {
         document.getElementById('sidebarUserName').textContent = u.full_name;
         const roles = { admin: 'مسؤول', manager: 'مدير مشروع', developer: 'مطور', marketer: 'مسوق' };
         document.getElementById('sidebarUserRole').textContent = roles[u.role] || u.role;
+        // Populate dropdown user info
+        const dropdownName = document.getElementById('dropdownUserName');
+        const dropdownEmail = document.getElementById('dropdownUserEmail');
+        if (dropdownName) dropdownName.textContent = u.full_name;
+        if (dropdownEmail) dropdownEmail.textContent = u.email || u.username;
+    },
+
+    setupQuickAddTask() {
+        const btn = document.getElementById('quickAddTaskBtn');
+        if (!btn) return;
+        btn.onclick = () => this.openQuickTaskModal();
+
+        const form = document.getElementById('quickTaskForm');
+        if (form) form.onsubmit = (e) => { e.preventDefault(); this.createQuickTask(); };
+
+        // When board changes, load its lists
+        const boardSelect = document.getElementById('quickTaskBoard');
+        if (boardSelect) boardSelect.onchange = () => this.loadListsForQuickTask();
+    },
+
+    async openQuickTaskModal() {
+        document.getElementById('quickTaskForm').reset();
+        document.getElementById('quickTaskPriority').value = 'medium';
+
+        // Make sure boards are loaded
+        if (!this.boards || !this.boards.length) {
+            await this.loadBoards();
+        }
+        const boardSelect = document.getElementById('quickTaskBoard');
+        boardSelect.innerHTML = '<option value="">-- اختر مشروع --</option>' +
+            this.boards.map(b => `<option value="${b.id}">${this.esc(b.name)}</option>`).join('');
+
+        // Default to current board if any
+        if (this.currentBoard) {
+            boardSelect.value = this.currentBoard.id;
+            await this.loadListsForQuickTask();
+        } else {
+            document.getElementById('quickTaskList').innerHTML = '<option value="">-- اختر مشروع أولاً --</option>';
+        }
+
+        // Populate assignees
+        this.populateAssigneeSelect('quickTaskAssigned');
+
+        // Default to assigning to khaled (the developer) if user is munther
+        if (this.user.username === 'munther') {
+            const khaled = this.users.find(u => u.username === 'khaled');
+            if (khaled) document.getElementById('quickTaskAssigned').value = khaled.id;
+        }
+
+        this.openModal('quickTaskModal');
+        document.getElementById('quickTaskTitle').focus();
+    },
+
+    async loadListsForQuickTask() {
+        const boardId = document.getElementById('quickTaskBoard').value;
+        const listSelect = document.getElementById('quickTaskList');
+        if (!boardId) {
+            listSelect.innerHTML = '<option value="">-- اختر مشروع أولاً --</option>';
+            return;
+        }
+        try {
+            const board = await this.api(`/api/boards/${boardId}`);
+            if (board && board.lists) {
+                listSelect.innerHTML = board.lists.map(l => `<option value="${l.id}">${this.esc(l.name)}</option>`).join('');
+            }
+        } catch(e) {
+            listSelect.innerHTML = '<option value="">خطأ في تحميل القوائم</option>';
+        }
+    },
+
+    async createQuickTask() {
+        const data = {
+            board_id: document.getElementById('quickTaskBoard').value,
+            list_id: document.getElementById('quickTaskList').value,
+            title: document.getElementById('quickTaskTitle').value,
+            description: document.getElementById('quickTaskDesc').value,
+            assigned_to: document.getElementById('quickTaskAssigned').value,
+            priority: document.getElementById('quickTaskPriority').value,
+            due_date: document.getElementById('quickTaskDueDate').value,
+        };
+        if (!data.board_id || !data.list_id || !data.title) {
+            this.toast('يرجى ملء كل الحقول المطلوبة', 'error'); return;
+        }
+        const res = await this.api('/api/tasks', 'POST', data);
+        if (res && !res.error) {
+            this.closeModal('quickTaskModal');
+            const assignee = this.users.find(u => u.id == data.assigned_to);
+            const msg = assignee ? `تم إسناد المهمة إلى ${assignee.full_name}` : 'تم إنشاء المهمة';
+            this.toast(msg, 'success');
+            // Refresh current board if it's the same one
+            if (this.currentBoard && this.currentBoard.id == data.board_id) {
+                this.openBoard(data.board_id);
+            }
+        } else {
+            this.toast('حدث خطأ', 'error');
+        }
+    },
+
+    setupUserDropdown() {
+        const avatar = document.getElementById('topbarAvatar');
+        const dropdown = document.getElementById('userDropdown');
+        if (!avatar || !dropdown) return;
+
+        avatar.onclick = (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('hidden');
+        };
+
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target) && e.target !== avatar) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // Menu items
+        const profileBtn = document.getElementById('dropdownProfile');
+        if (profileBtn) profileBtn.onclick = (e) => { e.preventDefault(); dropdown.classList.add('hidden'); this.toast('الملف الشخصي قريباً', 'info'); };
+
+        const myTasksBtn = document.getElementById('dropdownMyTasks');
+        if (myTasksBtn) myTasksBtn.onclick = (e) => { e.preventDefault(); dropdown.classList.add('hidden'); this.switchView('my-tasks'); };
+
+        const settingsBtn = document.getElementById('dropdownSettings');
+        if (settingsBtn) settingsBtn.onclick = (e) => { e.preventDefault(); dropdown.classList.add('hidden'); this.toast('الإعدادات قريباً', 'info'); };
+
+        const logoutBtn = document.getElementById('dropdownLogout');
+        if (logoutBtn) logoutBtn.onclick = async (e) => {
+            e.preventDefault();
+            if (!confirm('هل تريد تسجيل الخروج؟')) return;
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/logout';
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden'; csrf.name = '_token'; csrf.value = this.csrfToken;
+            form.appendChild(csrf);
+            document.body.appendChild(form);
+            form.submit();
+        };
     },
 
     // ==================== Events ====================
